@@ -1,14 +1,41 @@
-import mongoose from 'mongoose';
-import 'reflect-metadata';
-import app from './app'
-import { createServer } from "node:http";
+import express from "express";
+import mysql from "mysql2";
+import cors from 'cors';
+import "reflect-metadata";
+import apiRouter from './api/routes';
 
-mongoose.set('debug', true);
-mongoose.connect('mongodb://localhost:27017/preset')
-    .then(_ => { 
-        createServer(app).listen(3000, () => {
-            console.log('Server aperto sulla porta 3000');
-        });
-    }).catch(err => {
-        console.log(err);
-    });
+const app = express();
+const port = 3300;
+
+
+// === DATABASE CONNECTION ===
+const conn = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "password",
+  database: "RimborsiDB",
+});
+
+conn.connect((err) => {
+  if (err) {
+    console.error("Errore connessione DB:", err);
+    process.exit(1);
+  }
+  console.log("Connesso al database MySQL");
+});
+
+app.use(cors());
+app.use(express.json());
+
+
+app.get("/", (req, res) => {
+  res.send("Benvenuto nel server Node.js!");
+});
+
+
+app.use('/api', apiRouter);
+
+// === SERVER ===
+app.listen(port, () => {
+  console.log(`Server avviato su http://localhost:${port}`);
+});

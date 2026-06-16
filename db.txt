@@ -1,0 +1,55 @@
+-- 1. Crea il database
+CREATE DATABASE IF NOT EXISTS RimborsiDB
+
+USE RimborsiDB;
+
+-- 2. Tabella Utente
+CREATE TABLE IF NOT EXISTS Utente (
+    UtenteID INT AUTO_INCREMENT PRIMARY KEY,
+    Nome VARCHAR(100) NOT NULL,
+    Cognome VARCHAR(100) NOT NULL,
+    Email VARCHAR(255) NOT NULL UNIQUE,
+    Password VARCHAR(255) NOT NULL COMMENT 'hash bcrypt',
+    Ruolo ENUM('dipendente', 'responsabile') NOT NULL DEFAULT 'dipendente',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) 
+
+-- 3. Tabella CategoriaSpesa
+CREATE TABLE IF NOT EXISTS CategoriaSpesa (
+    CategoriaID INT AUTO_INCREMENT PRIMARY KEY,
+    Descrizione VARCHAR(255) NOT NULL
+)
+
+-- 4. Tabella RichiestaRimborso
+CREATE TABLE IF NOT EXISTS RichiestaRimborso (
+    RichiestaID INT AUTO_INCREMENT PRIMARY KEY,
+    DataInserimento DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    DataSpesa DATE NOT NULL,
+    CategoriaID INT NOT NULL,
+    Importo DECIMAL(10,2) NOT NULL,
+    Descrizione TEXT,
+    RiferimentoGiustificativo VARCHAR(255),
+    Stato ENUM('in_attesa', 'approvato', 'rifiutato', 'liquidato') NOT NULL DEFAULT 'in_attesa',
+    DipendenteID INT NOT NULL,
+    DataValutazione DATETIME NULL,
+    ResponsabileValutazioneID INT NULL,
+    MotivazioneRifiuto TEXT NULL,
+    DataLiquidazione DATE NULL,
+
+    -- Vincoli di chiave esterna
+    CONSTRAINT fk_richiesta_dipendente
+        FOREIGN KEY (DipendenteID) REFERENCES Utente(UtenteID)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_richiesta_responsabile
+        FOREIGN KEY (ResponsabileValutazioneID) REFERENCES Utente(UtenteID)
+        ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT fk_richiesta_categoria
+        FOREIGN KEY (CategoriaID) REFERENCES CategoriaSpesa(CategoriaID)
+        ON DELETE RESTRICT ON UPDATE CASCADE
+)
+
+-- Indici aggiuntivi per le chiavi esterne (MySQL li crea automaticamente, ma per chiarezza)
+CREATE INDEX idx_richiesta_dipendente ON RichiestaRimborso(DipendenteID);
+CREATE INDEX idx_richiesta_responsabile ON RichiestaRimborso(ResponsabileValutazioneID);
+CREATE INDEX idx_richiesta_categoria ON RichiestaRimborso(CategoriaID);

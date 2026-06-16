@@ -1,7 +1,7 @@
 export type User = {
     id?: string;
-    firstName: string;
-    lastName: string;
-    fullName?: string;
-    picture: string;
+    nome: string;
+    cognome: string;
+    email: string;
+    ruolo: "dipendente" | "responsabile";
 }

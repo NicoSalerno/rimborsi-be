@@ -1,7 +1,7 @@
 import './local/local-strategy';
-import './jwt/jwt-strategy';
+import '../jwt/jwt-strategy';
 
-import { User as iUser } from '../../api/user/user.entity';
+import { User as iUser } from '../../../api/user/user.entity';
 
 declare global {
     namespace Express {

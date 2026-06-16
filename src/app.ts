@@ -3,10 +3,8 @@ import morgan from 'morgan';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import apiRouter from './api/routes';
-import './lib/auth/auth.handlers';
-import 'dotenv/config';
-
 import { errorHandlers } from './errors';
+import './lib/auth/local/auth.handlers'; //file strategie
 
 const app = express();
 
@@ -17,6 +15,5 @@ app.use(bodyParser.json());
 app.use('/api', apiRouter);
 
 app.use(errorHandlers);
-
 
 export default app;
